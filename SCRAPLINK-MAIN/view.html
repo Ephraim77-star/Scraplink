@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrapLink - View Scraps</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body, html { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; }
+
+  /* Navbar */
+  nav {
+    position: fixed;
+    top:0; left:0; right:0;
+    height:60px; background:#fff; border-bottom:1px solid #ddd;
+    display:flex; align-items:center; padding:0 20px; z-index:1000;
+  }
+  nav .logo { display:flex; align-items:center; gap:10px; }
+  nav .logo img { width:30px; height:30px; cursor:pointer; }
+  nav .logo span { color:#0E8F5B; font-weight:bold; font-size:20px; }
+  nav select {
+    margin-left:auto; padding:5px 10px; border-radius:6px; border:1px solid #ccc; cursor:pointer;
+  }
+
+  /* Drawer */
+.drawer {
+  position: fixed;
+  top: 0;           /* covers navbar too */
+  left: -300px;     /* hidden initially */
+  width: 280px;
+  max-width: 80%;
+  height: 100%;
+  background:#F9FAFB;
+  box-shadow:2px 0 12px rgba(0,0,0,0.2);
+  transition: left 0.3s ease;
+  z-index: 2000;    /* higher than navbar (1000) */
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+}
+
+/* Overlay */
+.overlay { 
+  position:fixed; 
+  top:0; left:0; right:0; bottom:0; 
+  background:rgba(0,0,0,0.3); 
+  display:none; 
+  z-index:1999;  /* below drawer but above content */
+}
+  .drawer.open { left:0; }
+  .drawer-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .drawer-header .avatar { width:48px;height:48px;border-radius:24px;background:#0E8F5B; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; font-size:22px; }
+  .drawer-header .info { display:flex; flex-direction:column; }
+  .drawer-header .info .name { font-weight:bold; font-size:18px; color:#0A6D46; }
+  .drawer-header .info .tagline { font-size:14px; color:#64748B; }
+  .drawer hr { border:none; height:1px; background:#E2E8F0; margin:10px 0; }
+  .drawer .menu-item { display:flex; align-items:center; gap:12px; padding:10px; border-radius:8px; cursor:pointer; transition:background 0.2s; }
+  .drawer .menu-item:hover { background:#f5f5f5; }
+  .drawer .menu-item img { width:24px; height:24px; }
+  .drawer .menu-item span { color:#0A6D46; font-size:18px; }
+  .drawer .cta { margin-top:auto; width:100%; height:50px; border-radius:12px; background:#0E8F5B; color:white; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2); transition: background 0.3s; }
+  .drawer .cta:hover { background:#0b7043; }
+
+  
+  /* Feed Cards */
+  #feed { margin-top:60px; display:flex; flex-wrap:wrap; justify-content:center; gap:20px; padding:20px; }
+  .card { width:300px; border-radius:8px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; flex-direction:column; cursor:pointer; transition:transform 0.3s; }
+  .card:hover { transform:translateY(-5px); }
+  .thumbnail { width:100%; height:140px; border-radius:8px 8px 0 0; background:#ccc; background-size:cover; background-position:center; }
+  .card-body { padding:10px; display:flex; justify-content:space-between; align-items:center; }
+  .uploader { display:flex; align-items:center; gap:10px; }
+  .avatar-small { width:40px;height:40px;border-radius:20px;background:#0E8F5B; color:white; display:flex; justify-content:center; align-items:center; font-weight:bold; font-size:16px; }
+  .info { display:flex; flex-direction:column; }
+  .info .name { font-weight:bold; font-size:14px; }
+  .info .details { font-size:12px; color:#555; }
+  .info .location { font-size:12px; color:#777; }
+  .info .type { font-size:12px; color:#999; }
+  .buy-btn { background:#0E8F5B; color:white; border:none; border-radius:6px; padding:5px 10px; cursor:pointer; }
+  .buy-btn:hover { background:#0b7043; }
+
+  @media(max-width:768px){ .card { width:45%; } }
+  @media(max-width:500px){ .card { width:100%; } }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="avatar">S</div>
+    <div class="info">
+      <div class="name">ScrapLink</div>
+      <div class="tagline">eco-market</div>
+    </div>
+  </div>
+  <hr>
+  <div class="menu-item" onclick="window.location.href='home.html'"><img src="images/home.png" alt=""><span>Home Page</span></div>
+  <div class="menu-item" onclick="window.location.href='view.html'"><img src="images/view.png" alt=""><span>View Scraps</span></div>
+  <div class="menu-item" onclick="navigateTo('view.html')"><img src="images/buy.png" alt=""><span>Buy Scraps</span></div>
+  <div class="menu-item" onclick="window.location.href='post.html'"><img src="images/sell.png" alt=""><span>Post Scraps</span></div>
+  <div class="menu-item" onclick="window.location.href='supportUs.html'"><img src="images/support.png" alt=""><span>Support Us</span></div>
+  <div class="menu-item" onclick="signOutAndRedirect()"><img src="images/protect.png" alt=""><span>Sign Out</span></div>
+  <hr>
+  <div class="cta" onclick="console.log('Join Us clicked')">Join Us</div>
+</div>
+
+<script type="module">
+  import { signOut, getUser } from './auth.js';
+  window.authFns = Object.assign(window.authFns || {}, { signOut, getUser });
+  window.signOutAndRedirect = async function(){
+    try { if (window.authFns && window.authFns.signOut) await window.authFns.signOut(); } catch(e){ console.warn('Sign out failed', e); }
+    try { localStorage.removeItem('profileData:anon'); } catch(e){}
+    window.location.href = 'index.html';
+  };
+</script>
+
+<nav>
+  <div class="logo">
+    <img src="images/menu.png" id="menuBtn">
+    <span>ScrapLink</span>
+  </div>
+  <select id="locationFilter">
+    <option value="All">All Locations</option>
+    <option value="Lagos">Lagos</option>
+    <option value="Abuja">Abuja</option>
+    <option value="Port Harcourt">Port Harcourt</option>
+    <option value="Kano">Kano</option>
+    <option value="Ibadan">Ibadan</option>
+    <option value="Enugu">Enugu</option>
+    <option value="Benin">Benin</option>
+    <option value="Kaduna">Kaduna</option>
+    <option value="Jos">Jos</option>
+    <option value="Owerri">Owerri</option>
+  </select>
+
+  <select id="typeFilter" style="margin-left:10px;">
+    <option value="All">All Types</option>
+    <option value="degradables">degradables</option>
+    <option value="Plastic">Plastic</option>
+    <option value="Metal">Metal</option>
+    <option value="Cloth">Cloth</option>
+    <option value="Books">Books</option>
+    <option value="Electronics">Electronics</option>
+
+  </select>
+</nav>
+
+<div id="feed"></div>
+
+<script>
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('overlay');
+const menuBtn = document.getElementById('menuBtn');
+
+menuBtn.addEventListener('click', ()=>{ drawer.classList.add('open'); overlay.style.display='block'; });
+overlay.addEventListener('click', ()=>{ drawer.classList.remove('open'); overlay.style.display='none'; });
+
+function navigate(page){
+  console.log(page + " clicked");
+  drawer.classList.remove('open'); overlay.style.display='none';
+}
+
+// Feed cards
+const feed = document.getElementById('feed');
+
+const thumbnails = [
+  'simages/foodscrap.jpeg','simages/bookscrap2.jpeg','simages/plastic3.jpeg',
+  'simages/metals.jpeg','simages/books2.jpeg','simages/cloth2.jpeg',
+  'simages/foodscrap2.jpeg','simages/plastic2.jpeg','simages/books.jpeg','simages/plastics.jpeg'
+];
+const names = ['Alice','Bob','Charlie','David','Eva','Frank','Grace','Hannah','Ian','Julia'];
+const locations = ['Lagos','Abuja','Port Harcourt','Kano','Ibadan','Enugu','Benin','Kaduna','Jos','Owerri'];
+const types = ['Food','Books','Plastic','Metal','Books','Cloth','Food','Plastic','Books','Plastic'];
+
+for(let i=0;i<10;i++){
+  const card = document.createElement('div');
+  card.className='card';
+  card.dataset.location = locations[i];
+  card.dataset.type = types[i];
+
+  const thumb = document.createElement('div');
+  thumb.className='thumbnail';
+  thumb.style.background = `url('${thumbnails[i]}') center/cover no-repeat`;
+  thumb.onerror = () => { thumb.style.background = 'url("https://via.placeholder.com/300x140") center/cover no-repeat'; };
+
+  const body = document.createElement('div');
+  body.className='card-body';
+
+  const uploader = document.createElement('div');
+  uploader.className='uploader';
+  uploader.innerHTML = `<div class="avatar-small">${names[i][0]}</div>
+                        <div class="info">
+                          <div class="name">${names[i]}</div>
+                          <div class="details">Uploader • ${Math.floor(Math.random()*1000)}K views</div>
+                          <div class="location">${locations[i]}</div>
+                          <div class="type">${types[i]}</div>
+                        </div>`;
+
+  const buyBtn = document.createElement('button');
+  buyBtn.className='buy-btn';
+  buyBtn.innerText='Buy';
+  buyBtn.onclick = () => {
+  const scrapInfo = {
+    image: thumbnails[i],
+    name: names[i],
+    seller: names[i],
+    location: locations[i],
+    type: types[i],
+    views: Math.floor(Math.random()*1000)+'K',
+    description: "Sample description for this scrap item."
+  };
+  localStorage.setItem('selectedScrap', JSON.stringify(scrapInfo));
+  window.location.href = 'buy.html';
+};
+
+  body.appendChild(uploader);
+  body.appendChild(buyBtn);
+  card.appendChild(thumb);
+  card.appendChild(body);
+  feed.appendChild(card);
+}
+
+// After feed construction, load posts from localStorage and prepend them
+function loadLocalPosts(){
+  const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+  posts.forEach(post => {
+    try {
+      const card = document.createElement('div');
+      card.className='card';
+      card.dataset.location = post.location || 'Unknown';
+      card.dataset.type = post.type || 'Unknown';
+
+      const thumb = document.createElement('div');
+      thumb.className='thumbnail';
+      thumb.style.background = `url('${post.image}') center/cover no-repeat`;
+      thumb.onerror = () => { thumb.style.background = 'url("https://via.placeholder.com/300x140") center/cover no-repeat'; };
+
+      const body = document.createElement('div');
+      body.className='card-body';
+
+      const uploader = document.createElement('div');
+      uploader.className = 'uploader';
+      const initial = post.uploader && post.uploader[0] ? post.uploader[0] : 'S';
+      const avatarHtml = post.uploaderPic ? `<img src="${post.uploaderPic}" class="avatar-small" onerror="this.style.display='none'"/>` : `<div class="avatar-small">${initial}</div>`;
+      uploader.innerHTML = `${avatarHtml}
+                            <div class="info">
+                              <div class="name">${post.uploader || 'Uploader'}</div>
+                              <div class="details">Posted • ${new Date(post.createdAt).toLocaleString()}</div>
+                              <div class="location">${post.location || ''}</div>
+                              <div class="type">${post.type || ''}</div>
+                            </div>`;
+
+      const buyBtn = document.createElement('button');
+      buyBtn.className='buy-btn';
+      buyBtn.innerText='Buy';
+      buyBtn.onclick = () => {
+        localStorage.setItem('selectedScrap', JSON.stringify(post));
+        window.location.href = 'buy.html';
+      };
+
+      body.appendChild(uploader);
+      body.appendChild(buyBtn);
+      card.appendChild(thumb);
+      card.appendChild(body);
+
+      // place newest posts at the beginning
+      feed.insertBefore(card, feed.firstChild);
+    } catch (e) { console.warn('Failed rendering a local post', e); }
+  });
+}
+
+// Fetch posts from Supabase if available, otherwise render local posts
+async function loadServerPostsFirst() {
+  if (window.supabaseFns && window.supabaseFns.fetchPosts) {
+    try {
+      const res = await window.supabaseFns.fetchPosts({ limit: 100 });
+      if (res && !res.error && Array.isArray(res.data) && res.data.length) {
+        // render server posts
+        res.data.reverse().forEach(p => {
+          const post = {
+            id: p.id || Date.now(),
+            image: p.image_url || p.image,
+            description: p.description || '',
+            type: p.type || '',
+            location: p.location || '',
+            amount: p.amount || '',
+            uploader: p.uploader || 'Uploader',
+            uploaderPic: p.uploader_pic || p.uploader_pic_url || p.avatar_url || null,
+            createdAt: p.created_at || new Date().toISOString()
+          };
+          try {
+            const card = document.createElement('div');
+            card.className='card';
+            card.dataset.location = post.location || 'Unknown';
+            card.dataset.type = post.type || 'Unknown';
+
+            const thumb = document.createElement('div');
+            thumb.className='thumbnail';
+            thumb.style.background = `url('${post.image}') center/cover no-repeat`;
+            thumb.onerror = () => { thumb.style.background = 'url("https://via.placeholder.com/300x140") center/cover no-repeat'; };
+
+            const body = document.createElement('div');
+            body.className='card-body';
+
+            const uploader = document.createElement('div');
+            uploader.className='uploader';
+            const initial = post.uploader && post.uploader[0] ? post.uploader[0] : 'S';
+            const avatarHtml = post.uploaderPic ? `<img src="${post.uploaderPic}" class="avatar-small" onerror="this.style.display='none'"/>` : `<div class="avatar-small">${initial}</div>`;
+            uploader.innerHTML = `${avatarHtml}
+                                  <div class="info">
+                                    <div class="name">${post.uploader || 'Uploader'}</div>
+                                    <div class="details">Posted • ${new Date(post.createdAt).toLocaleString()}</div>
+                                    <div class="location">${post.location || ''}</div>
+                                    <div class="type">${post.type || ''}</div>
+                                  </div>`;
+
+            const buyBtn = document.createElement('button');
+            buyBtn.className='buy-btn';
+            buyBtn.innerText='Buy';
+            buyBtn.onclick = () => {
+              localStorage.setItem('selectedScrap', JSON.stringify(post));
+              window.location.href = 'buy.html';
+            };
+
+            body.appendChild(uploader);
+            body.appendChild(buyBtn);
+            card.appendChild(thumb);
+            card.appendChild(body);
+
+            feed.insertBefore(card, feed.firstChild);
+          } catch (e) { console.warn('Failed rendering a server post', e); }
+        });
+        return; // done
+      }
+    } catch (e) { console.warn('Error fetching server posts', e); }
+  }
+  // fallback to local
+  loadLocalPosts();
+}
+
+// call fetch
+loadServerPostsFirst();
+
+// Filters
+const locationFilter = document.getElementById('locationFilter');
+const typeFilter = document.getElementById('typeFilter');
+
+function applyFilters(){
+  const selectedLocation = locationFilter.value;
+  const selectedType = typeFilter.value;
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card=>{
+    const matchLocation = (selectedLocation==='All' || card.dataset.location===selectedLocation);
+    const matchType = (selectedType==='All' || card.dataset.type===selectedType);
+    card.style.display = (matchLocation && matchType) ? 'flex' : 'none';
+  });
+}
+
+locationFilter.addEventListener('change', applyFilters);
+typeFilter.addEventListener('change', applyFilters);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ScrapLink | Turn Waste Into Wealth</title>
+<style>
+  /* ----- RESET & GLOBAL IMPROVEMENTS ----- */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body, html {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: #fafcfb;
+    scroll-behavior: smooth;
+  }
+
+  /* custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #e4e7e6;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0E8F5B;
+    border-radius: 10px;
+  }
+
+  /* ----- NAVBAR (modern, clean, subtle shadow) ----- */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(2px);
+    border-bottom: 1px solid rgba(14, 143, 91, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  }
+
+  nav .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  nav .logo img {
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  nav .logo img:hover { transform: scale(1.02); }
+
+  nav .logo span {
+    color: #0E8F5B;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.3px;
+    background: linear-gradient(135deg, #0E8F5B, #099268);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* profile icon - refined */
+  .profile-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #0E8F5B;
+    transition: all 0.2s ease;
+    background: #f0f2f1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .profile-icon:hover {
+    transform: scale(1.03);
+    border-color: #14A857;
+    box-shadow: 0 4px 10px rgba(14,143,91,0.2);
+  }
+  .profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ----- DRAWER (sleeker, softer) ----- */
+  .drawer {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    max-width: 85%;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.12);
+    transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 20px 24px;
+    border-right: 1px solid rgba(14, 143, 91, 0.1);
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(3px);
+    display: none;
+    z-index: 1999;
+  }
+
+  .drawer.open {
+    left: 0;
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eef2f0;
+  }
+  .drawer-header .avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 32px;
+    background: linear-gradient(145deg, #0E8F5B, #0b7043);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 26px;
+    box-shadow: 0 4px 10px rgba(14,143,91,0.3);
+  }
+  .drawer-header .info .name {
+    font-weight: 700;
+    font-size: 20px;
+    color: #0A6D46;
+    letter-spacing: -0.2px;
+  }
+  .drawer-header .info .tagline {
+    font-size: 13px;
+    color: #5f6c7a;
+    margin-top: 4px;
+  }
+
+  .drawer hr {
+    border: none;
+    height: 1px;
+    background: #e6edea;
+    margin: 12px 0;
+  }
+
+  .drawer .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 4px 0;
+    color: #1a2e2a;
+    font-weight: 500;
+  }
+  .drawer .menu-item:hover {
+    background: #f0f9f4;
+    transform: translateX(4px);
+  }
+  .drawer .menu-item img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0.2) saturate(1);
+    opacity: 0.8;
+  }
+  .drawer .menu-item span {
+    color: #1f3e36;
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .drawer .cta {
+    margin-top: auto;
+    width: 100%;
+    height: 52px;
+    border-radius: 40px;
+    background: linear-gradient(95deg, #0E8F5B, #14A857);
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 6px 14px rgba(14,143,91,0.25);
+    border: none;
+  }
+  .drawer .cta:hover {
+    background: linear-gradient(95deg, #0b7a4d, #0E8F5B);
+    transform: scale(0.98);
+    box-shadow: 0 4px 10px rgba(14,143,91,0.3);
+  }
+
+  /* ----- HERO SECTION (enhanced gradient, better spacing) ----- */
+  .hero {
+    margin-top: 70px;
+    width: 100%;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 24px 90px;
+    gap: 28px;
+    background: linear-gradient(125deg, #0e8f5b, #0a6d46, #12805c, #0e8f5b);
+    background-size: 300% 300%;
+    animation: gradientBG 18s ease infinite;
+    position: relative;
+    border-radius: 0 0 32px 32px;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.05);
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 800px;
+  }
+  .hero p {
+    font-size: 20px;
+    max-width: 620px;
+    opacity: 0.95;
+    font-weight: 450;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .hero .buttons {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .hero .buttons button {
+    border: none;
+    border-radius: 60px;
+    padding: 12px 32px;
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .hero .buttons .sell {
+    background: white;
+    color: #0E8F5B;
+  }
+  .hero .buttons .sell:hover {
+    background: #f0fff5;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+  }
+  .hero .buttons .community {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(255,255,255,0.8);
+    color: white;
+  }
+  .hero .buttons .community:hover {
+    background: white;
+    color: #0E8F5B;
+    transform: translateY(-3px);
+  }
+
+  /* ----- FEATURE CARDS (modern glassy look) ----- */
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px;
+    padding: 60px 24px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    width: 230px;
+    background: #ffffff;
+    border-radius: 28px;
+    border: 1px solid rgba(14,143,91,0.15);
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+  }
+  .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 36px -12px rgba(14,143,91,0.25);
+    border-color: #0E8F5B40;
+  }
+  .feature-card span {
+    font-size: 44px;
+  }
+  .feature-card p {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1e2f2a;
+  }
+
+  /* ----- MARKETPLACE (clean category grid) ----- */
+  .marketplace {
+    padding: 40px 24px 60px;
+    text-align: center;
+    background: #ffffff;
+  }
+  .marketplace h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 36px;
+    color: #0A6D46;
+    letter-spacing: -0.5px;
+  }
+  .marketplace .categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 28px;
+  }
+  .category-card {
+    width: 190px;
+    background: #f9fefb;
+    border-radius: 28px;
+    border: 1px solid #dcece5;
+    padding: 24px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    transition: all 0.25s;
+  }
+  .category-card:hover {
+    background: #ffffff;
+    border-color: #0E8F5B;
+    transform: scale(1.02);
+    box-shadow: 0 12px 22px rgba(0,0,0,0.05);
+  }
+  .category-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0E8F5B;
+    letter-spacing: -0.2px;
+  }
+  .category-card button {
+    border: none;
+    background: #0E8F5B;
+    color: white;
+    border-radius: 40px;
+    padding: 8px 22px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .category-card button:hover {
+    background: #0b7a4d;
+    transform: scale(0.96);
+  }
+
+  /* ----- IMPACT SECTION (animated counters style) ----- */
+  .impact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 56px;
+    background: linear-gradient(110deg, #0A6D46, #0E8F5B);
+    color: white;
+    padding: 56px 24px;
+    text-align: center;
+    border-radius: 40px 40px 0 0;
+    margin-top: 20px;
+  }
+  .impact div {
+    font-weight: 700;
+    font-size: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    padding: 14px 28px;
+    border-radius: 60px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  /* ----- FOOTER (refined) ----- */
+  footer {
+    background: #064e34;
+    color: #d9f0e6;
+    text-align: center;
+    padding: 28px 20px;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Responsive touches */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 36px; }
+    .hero p { font-size: 18px; }
+    .hero { padding: 60px 20px; }
+    .feature-card { width: 180px; }
+    .category-card { width: 160px; }
+    .impact { gap: 24px; flex-direction: column; align-items: center; border-radius: 24px 24px 0 0;}
+    .impact div { font-size: 16px; width: 80%; }
+    nav { padding: 0 20px; height: 66px; }
+  }
+
+  @media (max-width: 480px) {
+    .features { gap: 16px; }
+    .feature-card { width: 100%; max-width: 260px; }
+    .marketplace .categories { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Drawer (exact same structure, slightly polished visually) -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="avatar">S</div>
+    <div class="info">
+      <div class="name">ScrapLink</div>
+      <div class="tagline">eco-market</div>
+    </div>
+  </div>
+  <hr>
+  <div class="menu-item" onclick="window.location.href='home.html'"><img src="images/home.png" alt=""><span>Home Page</span></div>
+  <div class="menu-item" onclick="window.location.href='view.html'"><img src="images/view.png" alt=""><span>View Scraps</span></div>
+  <div class="menu-item" onclick="navigateTo('view.html')"><img src="images/buy.png" alt=""><span>Buy Scraps</span></div>
+  <div class="menu-item" onclick="window.location.href='post.html'"><img src="images/sell.png" alt=""><span>Post Scraps</span></div>
+  <div class="menu-item" onclick="window.location.href='supportUs.html'"><img src="images/support.png" alt=""><span>Support Us</span></div>
+  <div class="menu-item" onclick="signOutAndRedirect()"><img src="images/protect.png" alt=""><span>Sign Out</span></div>
+  <hr>
+  <div class="cta" onclick="navigateTo('join.html')">Join Us</div>
+</div>
+
+<!-- Navbar -->
+<nav>
+  <div class="logo">
+    <img src="images/menu.png" alt="menu" id="menuBtn">
+    <span>ScrapLink</span>
+  </div>
+  <div class="profile-icon" onclick="window.location.href='profile.html'">
+    <img src="images/profile.png" alt="Profile">
+  </div>
+</nav>
+
+<!-- Hero Section (UI enhanced but functionality untouched) -->
+<section class="hero">
+  <h1>Turn Waste Into Wealth</h1>
+  <p>Sell recyclables, buy recycled products, and earn rewards.</p>
+  <div class="buttons">
+    <button class="sell" onclick="console.log('Sell Scrap')">Sell Scrap</button>
+    <button class="community" onclick="console.log('Join Community')">Join Community</button>
+  </div>
+</section>
+
+<!-- Features (improved styling) -->
+<section class="features">
+  <div class="feature-card" onclick="console.log('Sell Scrap Easily')"><span>♻️</span><p>Sell Scrap Easily</p></div>
+  <div class="feature-card" onclick="console.log('Earn Rewards')"><span>💰</span><p>Earn Rewards</p></div>
+  <div class="feature-card" onclick="console.log('Buy Recycled Products')"><span>🛒</span><p>Buy Recycled Products</p></div>
+  <div class="feature-card" onclick="console.log('Protect the Planet')"><span>🌍</span><p>Protect the Planet</p></div>
+</section>
+
+<!-- Marketplace -->
+<section class="marketplace">
+  <h2>Popular Categories</h2>
+  <div class="categories">
+    <div class="category-card"><h3>Plastic</h3><button>Sell Now</button></div>
+    <div class="category-card"><h3>Metal</h3><button>Sell Now</button></div>
+    <div class="category-card"><h3>Paper</h3><button>Sell Now</button></div>
+    <div class="category-card"><h3>Electronics</h3><button>Sell Now</button></div>
+  </div>
+</section>
+
+<!-- Impact -->
+<section class="impact">
+  <div>5,000+ KG of Plastic Recycled</div>
+  <div>1,200+ Users Earning from Waste</div>
+  <div>2,000+ Transactions Completed</div>
+</section>
+
+<!-- Footer -->
+<footer>© 2025 ScrapLink. Turning Waste Into Wealth.</footer>
+
+<!-- ========== ALL EXISTING JS FUNCTIONALITY EXACTLY PRESERVED ========== -->
+<script>
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('overlay');
+const menuBtn = document.getElementById('menuBtn');
+
+// Open/close drawer
+menuBtn.addEventListener('click', ()=>{ drawer.classList.add('open'); overlay.classList.add('show'); });
+overlay.addEventListener('click', ()=>{ drawer.classList.remove('open'); overlay.classList.remove('show'); });
+
+// Navigate function
+function navigateTo(url){
+  drawer.classList.remove('open');
+  overlay.classList.remove('show');
+  setTimeout(()=>{ window.location.href = url; }, 200);
+}
+
+// ✅ Load saved profile picture into navbar if available (user-scoped)
+window.onload = () => {
+  (async () => {
+    try {
+      let pic = null;
+      if (window.authFns && window.authFns.getUser) {
+        const r = await window.authFns.getUser();
+        const uid = r?.data?.user?.id;
+        if (uid) {
+          const pd = JSON.parse(localStorage.getItem(`profileData:${uid}`) || 'null');
+          pic = pd?.pic || null;
+          // if there's a stored Supabase storage path, try resolving it
+          if (!pic && pd?.profileStoragePath && window.supabaseFns && window.supabaseFns.getPublicUrl) {
+            pic = window.supabaseFns.getPublicUrl(pd.profileStoragePath);
+          }
+        }
+      }
+      if (!pic) {
+        const anon = JSON.parse(localStorage.getItem('profileData:anon') || 'null');
+        pic = anon?.pic || null;
+      }
+      if (pic) document.querySelector('.profile-icon img').src = pic;
+    } catch (e) { console.warn('Failed to load user-scoped profile pic', e); }
+  })();
+};
+
+// Update navbar profile icon when profileData changes in other tabs/windows
+window.addEventListener('storage', (e) => {
+  try {
+    if (!e || !e.key) return;
+    const key = e.key;
+    if (key !== 'profileData:anon' && !key.startsWith('profileData:')) return;
+    const imgEl = document.querySelector('.profile-icon img');
+    if (!imgEl) return;
+    const parsed = e.newValue ? JSON.parse(e.newValue) : null;
+    if (!parsed || !parsed.pic) return;
+
+    // If this is anon profileData, only use it when no authenticated user is present
+    if (key === 'profileData:anon') {
+      (async () => {
+        try {
+          if (window.authFns && window.authFns.getUser) {
+            const r = await window.authFns.getUser();
+            const uid = r?.data?.user?.id;
+            if (!uid) imgEl.src = parsed.pic;
+          } else {
+            imgEl.src = parsed.pic;
+          }
+        } catch (err) { imgEl.src = parsed.pic; }
+      })();
+      return;
+    }
+
+    // For user-scoped key ensure it matches the currently authenticated user
+    (async () => {
+      try {
+        if (window.authFns && window.authFns.getUser) {
+          const r = await window.authFns.getUser();
+          const uid = r?.data?.user?.id;
+          if (uid && key === `profileData:${uid}`) imgEl.src = parsed.pic;
+        } else {
+          // no auth info available: update anyway
+          imgEl.src = parsed.pic;
+        }
+      } catch (err) { imgEl.src = parsed.pic; }
+    })();
+  } catch (err) { console.warn('storage listener error', err); }
+});
+
+// Listen for BroadcastChannel messages (more reliable cross-tab communication)
+try {
+  const bc = new BroadcastChannel('scraplink');
+  bc.addEventListener('message', (ev) => {
+    try {
+      const msg = ev?.data;
+      if (!msg || msg.type !== 'profileUpdated') return;
+      const { key, value } = msg;
+      const imgEl = document.querySelector('.profile-icon img');
+      if (!imgEl) return;
+      if (!value || !value.pic) return;
+      if (key === 'profileData:anon') {
+        (async () => {
+          try {
+            if (window.authFns && window.authFns.getUser) {
+              const r = await window.authFns.getUser();
+              const uid = r?.data?.user?.id;
+              if (!uid) imgEl.src = value.pic;
+            } else imgEl.src = value.pic;
+          } catch (err) { imgEl.src = value.pic; }
+        })();
+        return;
+      }
+      (async () => {
+        try {
+          if (window.authFns && window.authFns.getUser) {
+            const r = await window.authFns.getUser();
+            const uid = r?.data?.user?.id;
+            if (uid && key === `profileData:${uid}`) imgEl.src = value.pic;
+          } else {
+            imgEl.src = value.pic;
+          }
+        } catch (err) { imgEl.src = value.pic; }
+      })();
+    } catch (err) { console.warn('BroadcastChannel message handling failed', err); }
+  });
+} catch (e) { /* BroadcastChannel unsupported */ }
+
+
+</script>
+
+<script type="module">
+  import { initSupabase, getPublicUrl } from './supabase.js';
+  import { signOut, getUser } from './auth.js';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+
+  // Initialize Supabase if config provided
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Expose small helper objects for other inline scripts
+  window.supabaseFns = { initSupabase, getPublicUrl };
+  window.authFns = { signOut, getUser };
+
+  // Global helper used by the drawer Sign Out menu item
+  window.signOutAndRedirect = async function() {
+    try {
+      if (window.authFns && window.authFns.signOut) {
+        await window.authFns.signOut();
+      }
+    } catch (err) {
+      console.error('Sign out failed', err);
+    } finally {
+      // Clear any simple client-side profile cache and go home
+      try { localStorage.removeItem('profileData:anon'); } catch (e) {}
+      window.location.href = 'index.html';
+    }
+  };
+</script>
+</body>
+</html>

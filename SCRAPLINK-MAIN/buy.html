@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrapLink - Buy Scrap</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background:#f5f5f5; padding:0; margin:0; }
+
+  /* Navbar */
+  nav {
+    position: fixed; top:0; left:0; right:0;
+    height:60px; background:#fff; border-bottom:1px solid #ddd;
+    display:flex; align-items:center; padding:0 20px; z-index:1000;
+  }
+  nav .logo { display:flex; align-items:center; gap:10px; }
+  nav .logo img { width:30px; height:30px; cursor:pointer; }
+  nav .logo span { color:#0E8F5B; font-weight:bold; font-size:20px; }
+  nav .back-btn { margin-right:20px; cursor:pointer; font-size:24px; }
+
+  /* Main Content */
+  .container { margin-top:70px; max-width:600px; margin-left:auto; margin-right:auto; padding:20px; background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+
+  .scrap-image { width:100%; height:250px; border-radius:12px; object-fit:cover; margin-bottom:20px; }
+  h2 { font-size:24px; color:#0E8F5B; margin-bottom:10px; }
+  .details { margin-bottom:15px; font-size:14px; color:#555; }
+  .details span { font-weight:bold; color:#0A6D46; }
+
+  .description { margin-bottom:20px; font-size:14px; line-height:1.4; }
+
+  .purchase-section { display:flex; flex-direction:column; gap:10px; }
+  .purchase-section label { font-weight:bold; color:#0E8F5B; }
+  .purchase-section input { padding:8px; border-radius:8px; border:1px solid #ccc; font-size:14px; }
+  .buy-btn { background:#0E8F5B; color:white; border:none; border-radius:8px; padding:10px; cursor:pointer; font-size:16px; transition:background 0.3s; }
+  .buy-btn:hover { background:#0b7043; }
+
+  @media(max-width:500px){ .container { margin:10px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="back-btn" onclick="window.history.back()">←</div>
+  <div class="logo">
+    <img src="images/menu.png" alt="logo">
+    <span>ScrapLink</span>
+  </div>
+</nav>
+
+<div class="container">
+  <img src="" id="scrapImage" class="scrap-image">
+  <h2 id="scrapTitle">Scrap Name</h2>
+  <div class="details"><span>Seller:</span> <span id="scrapSeller"></span></div>
+  <div class="details"><span>Location:</span> <span id="scrapLocation"></span></div>
+  <div class="details"><span>Views:</span> <span id="scrapViews"></span></div>
+  <div class="description" id="scrapDescription">Description goes here...</div>
+
+  <div class="purchase-section">
+    <label for="quantity">Amount to buy:</label>
+    <input type="number" id="quantity" min="1" value="1">
+    <button class="buy-btn" onclick="buyScrap()">Buy Now</button>
+  </div>
+</div>
+
+<script>
+  // Receive data from localStorage (set by feed page on Buy click)
+  const scrapData = JSON.parse(localStorage.getItem('selectedScrap')) || {};
+
+  document.getElementById('scrapImage').src = scrapData.image || 'https://via.placeholder.com/600x250';
+  document.getElementById('scrapTitle').innerText = scrapData.name || 'Unknown Scrap';
+  document.getElementById('scrapSeller').innerText = scrapData.seller || 'Unknown';
+  document.getElementById('scrapLocation').innerText = scrapData.location || 'Unknown';
+  document.getElementById('scrapViews').innerText = scrapData.views || '0';
+  document.getElementById('scrapDescription').innerText = scrapData.description || 'No description provided.';
+
+  // Prefill quantity from query param `amount` or from the selected scrap data's amount
+  (function prefillQuantity(){
+    const qtyInput = document.getElementById('quantity');
+    let defaultQty = 1;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paramAmount = params.get('amount');
+      if (paramAmount) {
+        defaultQty = Math.max(1, parseInt(paramAmount, 10) || 1);
+      } else if (scrapData.amount) {
+        defaultQty = Math.max(1, parseInt(scrapData.amount, 10) || 1);
+      }
+    } catch (e) { console.warn('Could not prefill quantity', e); }
+    qtyInput.value = defaultQty;
+  })();
+
+  function buyScrap(){
+    const qty = document.getElementById('quantity').value;
+    alert(`You have bought ${qty} of ${scrapData.name}`);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrapLink - Post Scrap</title>
+<style>
+  /* Reset & Base */
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body, html { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background: #f5f5f5; }
+
+  /* Navbar */
+  nav {
+    position: fixed;
+    top:0; left:0; right:0;
+    height: 60px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+  }
+  nav .logo {
+    display: flex;
+    align-items: center;
+    gap:10px;
+  }
+  nav .logo img { width:30px; height:30px; cursor:pointer; }
+  nav .logo span { color:#0E8F5B; font-weight:bold; font-size:20px; }
+
+  /* Profile Icon */
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #0E8F5B;
+  }
+  .profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Drawer */
+  .drawer {
+    position: fixed;
+    top: 0; left: -300px;
+    width: 280px;
+    max-width: 80%;
+    height: 100%;
+    background:#F9FAFB;
+    box-shadow:2px 0 12px rgba(0,0,0,0.2);
+    transition: left 0.3s ease;
+    z-index: 2000;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+  }
+  .drawer.open { left:0; }
+
+  /* Overlay */
+  .overlay { 
+    position:fixed; top:0; left:0; right:0; bottom:0; 
+    background:rgba(0,0,0,0.3); 
+    display:none; z-index:1999; 
+  }
+  .overlay.show { display:block; }
+
+  .drawer-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .drawer-header .avatar { width:48px;height:48px;border-radius:24px;background:#0E8F5B; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:22px; }
+  .drawer-header .info { display:flex; flex-direction:column; }
+  .drawer-header .info .name { font-weight:bold; font-size:18px; color:#0A6D46; }
+  .drawer-header .info .tagline { font-size:14px; color:#64748B; }
+
+  .drawer hr { border:none; height:1px; background:#E2E8F0; margin:10px 0; }
+  .drawer .menu-item {
+    display:flex; align-items:center; gap:12px; padding:10px; border-radius:8px; cursor:pointer;
+    transition: background 0.2s;
+  }
+  .drawer .menu-item:hover { background:#f5f5f5; }
+  .drawer .menu-item img { width:24px; height:24px; }
+  .drawer .menu-item span { color:#0A6D46; font-size:18px; }
+
+  .drawer .cta {
+    margin-top:auto;
+    width:100%; height:50px;
+    border-radius:12px; background:#0E8F5B;
+    color:white; font-weight:bold; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    transition: background 0.3s;
+  }
+  .drawer .cta:hover { background:#0b7043; }
+
+  /* Post Form */
+  h1 { text-align:center; margin:90px 0 20px; color:#0E8F5B; }
+  .form-container {
+    max-width:600px;
+    margin:0 auto;
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.1);
+    display:flex; flex-direction:column; gap:15px;
+  }
+  label { font-weight:bold; margin-bottom:5px; color:#0A6D46; }
+  input[type="text"], input[type="number"], textarea, select {
+    width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; outline:none; font-size:14px;
+  }
+  textarea { resize:none; height:100px; }
+  select { cursor:pointer; }
+
+  .image-upload {
+    border:2px dashed #0E8F5B;
+    border-radius:8px;
+    height:200px;
+    display:flex; align-items:center; justify-content:center;
+    color:#0E8F5B; font-weight:bold; cursor:pointer;
+    position:relative;
+    text-align:center;
+  }
+  .image-upload input {
+    position:absolute; width:100%; height:100%;
+    opacity:0; cursor:pointer;
+  }
+  .image-preview {
+    margin-top:10px; width:100%; height:200px;
+    object-fit:cover; border-radius:8px; display:none;
+  }
+
+  button {
+    background:#0E8F5B; color:white; font-weight:bold;
+    border:none; border-radius:8px; padding:12px;
+    cursor:pointer; transition:all 0.3s;
+  }
+  button:hover { background:#0b7043; }
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="avatar">S</div>
+    <div class="info">
+      <div class="name">ScrapLink</div>
+      <div class="tagline">eco-market</div>
+    </div>
+  </div>
+  <hr>
+   <div class="menu-item" onclick="window.location.href='home.html'"><img src="images/home.png" alt=""><span>Home Page</span></div>
+  <div class="menu-item" onclick="window.location.href='view.html'"><img src="images/view.png" alt=""><span>View Scraps</span></div>
+  <div class="menu-item" onclick="navigateTo('view.html')"><img src="images/buy.png" alt=""><span>Buy Scraps</span></div>
+  <div class="menu-item" onclick="window.location.href='post.html'"><img src="images/sell.png" alt=""><span>Post Scraps</span></div>
+  <div class="menu-item" onclick="window.location.href='supportUs.html'"><img src="images/support.png" alt=""><span>Support Us</span></div>
+  <div class="menu-item" onclick="signOutAndRedirect()"><img src="images/protect.png" alt=""><span>Sign Out</span></div>
+  <hr>
+  <div class="cta" onclick="navigateTo('join.html')">Join Us</div>
+</div>
+
+<!-- Navbar -->
+<nav>
+  <div class="logo">
+    <img src="images/menu.png" alt="menu" id="menuBtn">
+    <span>ScrapLink</span>
+  </div>
+  <div class="profile-icon" onclick="navigateTo('profile.html')">
+    <img src="images/profile.png" alt="Profile">
+  </div>
+</nav>
+
+<!-- Post Scrap Form -->
+<h1>Post Your Scrap</h1>
+<div class="form-container">
+  <label>Upload Image</label>
+  <div class="image-upload" id="imageUpload">Click or Drag Image Here
+    <input type="file" accept="image/*" id="scrapImage">
+  </div>
+  <img id="imagePreview" class="image-preview">
+
+  <label>Description</label>
+  <textarea id="description" placeholder="Write a description..."></textarea>
+
+  <label>Type of Scrap</label>
+  <select id="scrapType">
+    <option value="">Select Type</option>
+    <option value="Plastic">Plastic</option>
+    <option value="Metal">Metal</option>
+    <option value="Paper">Paper</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Cloth">Cloth</option>
+    <option value="degradables">degradables</option>
+  </select>
+
+  <label>Location</label>
+  <select id="scrapLocation">
+    <option value="">Select Location</option>
+    <option value="Lagos">Lagos</option>
+    <option value="Abuja">Abuja</option>
+    <option value="Port Harcourt">Port Harcourt</option>
+    <option value="Kano">Kano</option>
+    <option value="Ibadan">Ibadan</option>
+    <option value="Enugu">Enugu</option>
+    <option value="Benin">Benin</option>
+    <option value="Kaduna">Kaduna</option>
+    <option value="Jos">Jos</option>
+    <option value="Owerri">Owerri</option>
+  </select>
+
+  <label>Amount to Sell</label>
+  <input type="number" id="scrapAmount" placeholder="Enter amount in Naira">
+
+  <button id="submitBtn">Post Scrap</button>
+</div>
+
+<script>
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('overlay');
+const menuBtn = document.getElementById('menuBtn');
+const scrapImage = document.getElementById('scrapImage');
+const imagePreview = document.getElementById('imagePreview');
+const submitBtn = document.getElementById('submitBtn');
+
+let currentImageDataUrl = null; // holds preview/data url when file chosen
+let currentImageStoragePath = null; // holds storage path when uploaded to Supabase
+
+// Drawer controls
+menuBtn.addEventListener('click', ()=>{ drawer.classList.add('open'); overlay.classList.add('show'); });
+overlay.addEventListener('click', ()=>{ drawer.classList.remove('open'); overlay.classList.remove('show'); });
+
+function navigateTo(url){
+  drawer.classList.remove('open');
+  overlay.classList.remove('show');
+  setTimeout(()=>{ window.location.href = url; }, 200);
+}
+
+// ✅ Load saved profile picture into navbar if available
+window.addEventListener('load', () => {
+  (async () => {
+    try {
+      let profileImgSrc = null;
+      if (window.authFns && window.authFns.getUser) {
+        const r = await window.authFns.getUser();
+        const uid = r?.data?.user?.id;
+        if (uid) {
+          const p = JSON.parse(localStorage.getItem(`profileData:${uid}`) || 'null');
+          profileImgSrc = p?.pic || null;
+        }
+      }
+      // fallback to anon-scope
+      if (!profileImgSrc) profileImgSrc = JSON.parse(localStorage.getItem('profileData:anon') || 'null')?.pic || null;
+      if (profileImgSrc) document.querySelector('.profile-icon img').src = profileImgSrc;
+    } catch (e) { console.warn('Failed to load profile image', e); }
+  })();
+});
+
+// Image preview
+scrapImage.addEventListener('change', function() {
+  const file = this.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      imagePreview.src = e.target.result;
+      imagePreview.style.display = 'block';
+      currentImageDataUrl = e.target.result; // store for submit
+    }
+    reader.readAsDataURL(file);
+    // If supabase helpers are available, upload immediately and replace preview src with public URL
+    (async () => {
+      try {
+        if (window.supabaseFns && window.supabaseFns.uploadFile && window.supabaseFns.getPublicUrl) {
+      const path = `posts/profile_${Date.now()}.jpg`;
+      const res = await window.supabaseFns.uploadFile(file, path, 'avatars');
+          if (!res.error) {
+            const pub = window.supabaseFns.getPublicUrl(path, 'avatars');
+            if (pub) {
+              imagePreview.src = pub;
+        currentImageDataUrl = pub; // store public url for submit
+        currentImageStoragePath = path; // store storage path for submit
+              // also save to user-scoped local profileData so navbar shows it
+                (async () => {
+                  try {
+                    if (window.authFns && window.authFns.getUser) {
+                      const r = await window.authFns.getUser();
+                      const uid = r?.data?.user?.id;
+                      if (uid) {
+                        const existing = JSON.parse(localStorage.getItem(`profileData:${uid}`) || 'null') || {};
+                        existing.pic = pub;
+                        localStorage.setItem(`profileData:${uid}`, JSON.stringify(existing));
+                      } else {
+                        const existing = JSON.parse(localStorage.getItem('profileData:anon') || 'null') || {};
+                        existing.pic = pub;
+                        localStorage.setItem('profileData:anon', JSON.stringify(existing));
+                      }
+                    }
+                  } catch (e) { console.warn('saving user-scoped profilePic failed', e); }
+                })();
+            }
+          } else {
+            console.warn('Supabase immediate upload failed:', res.error);
+          }
+        }
+      } catch (e) { console.warn('Immediate upload to Supabase failed', e); }
+    })();
+  }
+});
+
+// Helper to push a post into localStorage
+function savePostLocally(post) {
+  const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+  posts.unshift(post); // newest first
+  localStorage.setItem('posts', JSON.stringify(posts));
+}
+
+// Post Scrap
+submitBtn.addEventListener('click', async function(){
+  const description = document.getElementById('description').value;
+  const type = document.getElementById('scrapType').value;
+  const location = document.getElementById('scrapLocation').value;
+  const amount = document.getElementById('scrapAmount').value;
+
+  // Require authentication if auth helper is available
+  try {
+    if (window.authFns && window.authFns.getUser) {
+      const u = await window.authFns.getUser();
+      const user = u?.data?.user;
+      if (!user) {
+        alert('Please login to post scraps.');
+        window.location.href = 'login.html';
+        return;
+      }
+    }
+  } catch (e) { console.warn('Auth check failed', e); }
+
+  if(!scrapImage.files[0] && !currentImageDataUrl){
+    alert('Please upload an image.');
+    return;
+  }
+  if(!description || !type || !location || !amount){
+    alert('Please fill all fields.');
+    return;
+  }
+
+  // Prepare post object
+  const timestamp = Date.now();
+  // Resolve uploader data from user-scoped localStorage (fallback to anon)
+  let uploaderName = 'Anonymous';
+  let uploaderPic = null;
+  try {
+    let pd = null;
+    if (window.authFns && window.authFns.getUser) {
+      const ur = await window.authFns.getUser();
+      const uid = ur?.data?.user?.id;
+      if (uid) pd = JSON.parse(localStorage.getItem(`profileData:${uid}`) || 'null');
+      // if no local profile data, prefer the server-side user metadata (full_name) when available
+      if ((!pd || !pd.name) && ur?.data?.user?.user_metadata?.full_name) {
+        pd = pd || {};
+        pd.name = ur.data.user.user_metadata.full_name;
+      }
+    }
+    if (!pd) pd = JSON.parse(localStorage.getItem('profileData:anon') || 'null');
+    uploaderName = pd?.name || 'Anonymous';
+    uploaderPic = pd?.pic || null;
+  } catch (e) { console.warn('Failed to resolve uploaderData', e); }
+
+  let imageUrl = currentImageDataUrl; // default to data URL preview
+  let imageStoragePath = currentImageStoragePath || null;
+
+  // If Supabase helpers available, try to upload and use public URL (explicitly to 'avatars' bucket)
+  try {
+    if (window.supabaseFns && window.supabaseFns.uploadFile && window.supabaseFns.getPublicUrl) {
+      const fileToUpload = scrapImage.files[0] ? scrapImage.files[0] : currentImageDataUrl;
+      const path = `posts/${timestamp}.png`;
+      const res = await window.supabaseFns.uploadFile(fileToUpload, path, 'avatars');
+      if (!res.error) {
+        // get public url from avatar bucket
+        const pub = window.supabaseFns.getPublicUrl(path, 'avatars');
+        if (pub) {
+          imageUrl = pub;
+          imageStoragePath = path;
+        }
+      } else {
+        console.warn('Supabase upload failed', res.error);
+      }
+    }
+  } catch (err) {
+    console.warn('Error uploading to Supabase', err);
+  }
+
+  const post = {
+    id: timestamp,
+    image: imageUrl,
+  image_storage_path: imageStoragePath,
+    description,
+    type,
+    location,
+    amount,
+    uploader: uploaderName,
+  uploaderPic: uploaderPic,
+    createdAt: new Date(timestamp).toISOString()
+  };
+
+  // Try to insert post into Supabase posts table if available
+  try {
+    if (window.supabaseFns && window.supabaseFns.insertPost) {
+      const dbPost = {
+        image_url: imageUrl,
+  image_storage_path: imageStoragePath,
+        description,
+        type,
+        location,
+        amount,
+  uploader: uploaderName,
+  uploader_pic: uploaderPic
+      };
+
+      // Attach uploader_id from authenticated user so RLS policies can enforce ownership
+      try {
+        if (window.authFns && window.authFns.getUser) {
+          const authRes = await window.authFns.getUser();
+          const user = authRes?.data?.user;
+          if (user && user.id) {
+            dbPost.uploader_id = user.id;
+          }
+        }
+      } catch (attachErr) {
+        console.warn('Failed to attach uploader_id to dbPost', attachErr);
+      }
+
+      const insertRes = await window.supabaseFns.insertPost(dbPost);
+      if (insertRes && insertRes.error) {
+        console.warn('Failed to insert post into Supabase:', insertRes.error);
+      }
+    }
+  } catch (e) {
+    console.warn('Error inserting post to Supabase', e);
+  }
+
+  // Save locally so view.html can load it
+  savePostLocally(post);
+
+  alert(`Scrap Posted!\nType: ${type}\nLocation: ${location}\nAmount: ₦${amount}`);
+  setTimeout(()=>{ window.location.href = "view.html"; }, 200);
+});
+</script>
+
+<script type="module">
+  import { initSupabase, getPublicUrl, saveProfileAndReturnUrl, insertPost, uploadFile } from './supabase.js';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.supabaseFns = { initSupabase, getPublicUrl, saveProfileAndReturnUrl, insertPost, uploadFile };
+
+  // import auth helpers and expose them
+  import { getUser, signIn, signUp, signOut, onAuthChange } from './auth.js';
+  window.authFns = { getUser, signIn, signUp, signOut, onAuthChange };
+
+  // Global helper to sign out and redirect to home
+  window.signOutAndRedirect = async function() {
+    try {
+      if (window.authFns && window.authFns.signOut) await window.authFns.signOut();
+    } catch (err) {
+      console.error('Sign out failed', err);
+    } finally {
+      try { localStorage.removeItem('profileData:anon'); } catch (e) {}
+      window.location.href = 'index.html';
+    }
+  };
+</script>
+</body>
+</html>

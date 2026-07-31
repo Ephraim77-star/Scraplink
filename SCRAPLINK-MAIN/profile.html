@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    /* ✅ Drawer */
+    .drawer {
+      width: 260px;
+      height: 100vh;
+      background: #fff;
+      position: fixed;
+      top: 0;
+      left: -260px;
+      transition: left 0.3s ease;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      z-index: 1200; /* higher so it overlaps content */
+      padding-top: 20px;
+    }
+    .drawer.open {
+      left: 0;
+    }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+    }
+    .avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #0E8F5B;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .info .name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .info .tagline {
+      font-size: 12px;
+      color: gray;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .menu-item:hover {
+      background: #f1f1f1;
+    }
+    .menu-item img {
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+    }
+    .cta {
+      margin: 20px;
+      padding: 12px;
+      background: #0E8F5B;
+      color: #fff;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* ✅ Drawer Toggle (Hamburger) */
+    .hamburger {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1300; /* above drawer (1200) so it remains visible */
+      color: #0E8F5B;
+      background: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    /* ✅ Profile Page */
+    .content {
+      margin-left: 0;
+      padding: 80px 20px;
+      text-align: center;
+      /* no margin transition; drawer will overlap instead of shifting */
+    }
+    .profile-container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #0E8F5B;
+      object-fit: cover;
+    }
+    .upload-btn {
+      margin-top: 10px;
+      padding: 8px 18px;
+      background: #0E8F5B;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .upload-btn:hover {
+      background: #0b7043;
+    }
+    .profile-input {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .save-btn {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background: #0E8F5B;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .save-btn:hover {
+      background: #0b7043;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ✅ Drawer -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="avatar">S</div>
+    <div class="info">
+      <div class="name">ScrapLink</div>
+      <div class="tagline">eco-market</div>
+    </div>
+  </div>
+  <hr>
+  <div class="menu-item" onclick="navigateTo('home.html')">
+    <img src="images/home.png" alt=""><span>Home Page</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('view.html')">
+    <img src="images/view.png" alt=""><span>View Scraps</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('view.html')">
+    <img src="images/buy.png" alt=""><span>Buy Scraps</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('post.html')">
+    <img src="images/sell.png" alt=""><span>Post Scraps</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('supportUs.html')">
+    <img src="images/support.png" alt=""><span>Support Us</span>
+  </div>
+    <div class="menu-item" onclick="signOutAndRedirect()">
+      <img src="images/protect.png" alt=""><span>Sign Out</span>
+    </div>
+  <hr>
+  <div class="cta" onclick="navigateTo('join.html')">Join Us</div>
+</div>
+
+<!-- ✅ Drawer Toggle -->
+<div class="hamburger" onclick="toggleDrawer()">☰</div>
+
+<!-- ✅ Profile Content -->
+<div class="content">
+  <div class="profile-container">
+    <h2>My Profile</h2>
+    <img id="profilePic" class="profile-pic" src="default-profile.png" alt="Profile">
+    <br>
+    <input type="file" id="fileInput" style="display: none;" accept="image/*">
+    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Change Photo</button>
+    
+    <input type="text" id="name" class="profile-input" placeholder="Full Name">
+    <input type="email" id="email" class="profile-input" placeholder="Email Address">
+    <textarea id="bio" class="profile-input" placeholder="Short Bio"></textarea>
+    
+    <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+  <div id="saveMessage" aria-live="polite" style="margin-top:12px; font-weight:600; color:#0E8F5B;"></div>
+  </div>
+</div>
+
+  <script type="module">
+    import { signOut, getUser } from './auth.js';
+    window.authFns = Object.assign(window.authFns || {}, { signOut, getUser });
+    window.signOutAndRedirect = async function(){
+      try { if (window.authFns && window.authFns.signOut) await window.authFns.signOut(); } catch(e){ console.warn('Sign out failed', e); }
+      try { localStorage.removeItem('profileData:anon'); } catch(e){}
+      window.location.href = 'index.html';
+    };
+  </script>
+
+<script>
+  // ✅ Drawer toggle
+  function toggleDrawer() {
+    document.getElementById("drawer").classList.toggle("open");
+  }
+
+  function navigateTo(page) {
+    window.location.href = page;
+  }
+
+  const profilePic = document.getElementById("profilePic");
+  const fileInput = document.getElementById("fileInput");
+
+  // Helper: determine per-user storage key for profileData
+  async function getLocalProfileKey() {
+    try {
+      if (window.authFns && window.authFns.getUser) {
+        const r = await window.authFns.getUser();
+        const uid = r?.data?.user?.id;
+        if (uid) return `profileData:${uid}`;
+      }
+    } catch (e) { /* ignore */ }
+    return 'profileData:anon';
+  }
+
+  // ✅ Upload and preview profile photo
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        profilePic.src = e.target.result;
+  // preview only; actual saving/notification happens when Save Profile is clicked
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // ✅ Save profile data
+  async function saveProfile() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const bio = document.getElementById("bio").value;
+
+  const profileData = { name, email, bio, pic: profilePic.src };
+
+    // If Supabase helpers were initialized, try to persist profile server-side
+    try {
+      // Attempt image upload first if helper exists
+      if (window.supabaseFns && window.supabaseFns.saveProfileAndReturnUrl) {
+        const uid = await (async () => {
+          try {
+            if (window.authFns && window.authFns.getUser) {
+              const r = await window.authFns.getUser();
+              return r?.data?.user?.id || null;
+            }
+          } catch (e) { console.warn('getUser failed while saving profile', e); }
+          return null;
+        })();
+
+        // Decide on a per-user identifier: authenticated uid or a generated anon id
+        const fileToUpload = fileInput.files[0] ? fileInput.files[0] : profilePic.src;
+        let identifier = uid;
+        if (!identifier) {
+          // ensure we have a stable anon id for this browser/session
+          identifier = localStorage.getItem('anonUserId');
+          if (!identifier) {
+            identifier = 'anon_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+            try { localStorage.setItem('anonUserId', identifier); } catch (e) {}
+          }
+        }
+
+        // Use a timestamped filename so each upload is unique per-user, but grouped under users/<identifier>/
+        const path = `users/${identifier}/profile_${Date.now()}.png`;
+        // Determine previous storage path (local and server) so we can clean it up after a successful upload
+        let prevLocalPath = null;
+        let prevServerPath = null;
+        try {
+          const localKey = await getLocalProfileKey();
+          const prevLocal = JSON.parse(localStorage.getItem(localKey) || 'null');
+          prevLocalPath = prevLocal?.profileStoragePath || null;
+        } catch (e) { /* ignore */ }
+        try {
+          if (uid && window.supabaseFns && window.supabaseFns.getProfile) {
+            const r = await window.supabaseFns.getProfile(uid);
+            if (!r.error && r.data) {
+              prevServerPath = r.data?.profile_storage_path || r.data?.profileStoragePath || null;
+            }
+          }
+        } catch (e) { /* ignore */ }
+
+        try {
+          const uploadRes = await window.supabaseFns.saveProfileAndReturnUrl(fileToUpload, path);
+          if (!uploadRes.error && uploadRes.url) {
+            profileData.pic = uploadRes.url;
+            profileData.profileStoragePath = path;
+
+            // Attempt to cleanup previous files (prefer server path, fallback to local path)
+            const toDelete = (prevServerPath && prevServerPath !== profileData.profileStoragePath) ? prevServerPath : (prevLocalPath && prevLocalPath !== profileData.profileStoragePath ? prevLocalPath : null);
+            if (toDelete && window.supabaseFns && window.supabaseFns.removeFile) {
+              try {
+                await window.supabaseFns.removeFile(toDelete, 'avatars');
+              } catch (delErr) { console.warn('Failed to remove previous profile image', delErr); }
+            }
+          } else {
+            console.warn('Supabase profile image upload failed', uploadRes.error);
+          }
+        } catch (uploadErr) {
+          console.warn('Supabase profile image upload threw', uploadErr);
+        }
+
+        // If authenticated, upsert profile row in DB (requires auth/RLS). Use uid when available.
+        if (uid) {
+          try {
+            const profileRow = {
+              id: uid,
+              username: name || null,
+              email: email || null,
+              full_name: name || null,
+              avatar_url: profileData.pic || null,
+              profile_storage_path: profileData.profileStoragePath || null
+            };
+            const upsertRes = await window.supabaseFns.upsertProfile(profileRow);
+            if (upsertRes?.error) console.warn('Failed to upsert profile row:', upsertRes.error);
+          } catch (upErr) {
+            console.warn('Error upserting profile row', upErr);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Error while uploading to Supabase:', err);
+    }
+
+    // Show saving message
+    showMessage('Saving profile...', 'info');
+
+    // Always save to localStorage as fallback (user-scoped) and notify other pages
+    try {
+      const key = await getLocalProfileKey();
+      localStorage.setItem(key, JSON.stringify(profileData));
+      // Notify other tabs/pages using BroadcastChannel and a custom event for same-window listeners
+      try {
+        const bc = new BroadcastChannel('scraplink');
+        bc.postMessage({ type: 'profileUpdated', key, value: profileData });
+      } catch (e) { /* BroadcastChannel may not be supported */ }
+      try { window.dispatchEvent(new CustomEvent('profileUpdated', { detail: { key, value: profileData } })); } catch(e){}
+      showMessage('Profile saved successfully!', 'success');
+      // auto-hide after a short delay
+      setTimeout(()=>{ showMessage('', ''); }, 3000);
+    } catch (e) {
+      console.warn('Saving local profileData failed', e);
+      showMessage('Failed to save profile locally', 'error');
+    }
+  }
+
+  // Small helper to show a message to the user in the profile UI
+  function showMessage(msg, type) {
+    const el = document.getElementById('saveMessage');
+    if (!el) return;
+    el.textContent = msg || '';
+    if (!msg) return;
+    if (type === 'error') el.style.color = '#D04444';
+    else if (type === 'success') el.style.color = '#0E8F5B';
+    else el.style.color = '#0E8F5B';
+  }
+
+  // ✅ Load profile data
+  window.onload = () => {
+    // Load any saved preview from user-scoped localStorage
+    (async () => {
+      try {
+        const key = await getLocalProfileKey();
+        const saved = JSON.parse(localStorage.getItem(key) || 'null');
+        if (saved && saved.pic) profilePic.src = saved.pic;
+      } catch (e) { console.warn('loading local profile preview failed', e); }
+    })();
+
+    // If logged-in and supabase helpers are available, fetch profile from DB
+  (async () => {
+      try {
+        if (window.authFns && window.authFns.getUser && window.supabaseFns && window.supabaseFns.getProfile) {
+          const ur = await window.authFns.getUser();
+          const user = ur?.data?.user;
+          if (user && user.id) {
+            const r = await window.supabaseFns.getProfile(user.id);
+            if (!r.error && r.data) {
+              const p = r.data;
+              document.getElementById("name").value = p.full_name || p.username || '';
+              document.getElementById("email").value = p.email || (user.email || '');
+              document.getElementById("bio").value = p.bio || '';
+              profilePic.src = p.avatar_url || profilePic.src || "default-profile.png";
+              // store locally for offline fallback under user key
+              try { localStorage.setItem(`profileData:${user.id}`, JSON.stringify({ name: p.full_name, email: p.email, bio: p.bio, pic: p.avatar_url })); } catch(e){}
+              return;
+            }
+          }
+        }
+      } catch (e) { console.warn('Failed to load profile from Supabase', e); }
+
+      // Fallback to user-scoped localStorage
+      try {
+        const key = await getLocalProfileKey();
+        const savedData = JSON.parse(localStorage.getItem(key) || 'null');
+        if (savedData) {
+          document.getElementById("name").value = savedData.name;
+          document.getElementById("email").value = savedData.email;
+          document.getElementById("bio").value = savedData.bio;
+          profilePic.src = savedData.pic || "default-profile.png";
+        }
+      } catch (e) { console.warn('loading fallback profileData failed', e); }
+    })();
+  };
+</script>
+
+<!-- Supabase module helper: set SUPABASE_URL and SUPABASE_ANON_KEY here to enable uploads -->
+<script type="module">
+  import { initSupabase, saveProfileAndReturnUrl, getPublicUrl } from './supabase.js';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+
+  // Initialize if keys are present in config.js
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  // Expose small helpers on window so the non-module script can call them.
+  import { getProfile, upsertProfile, removeFile } from './supabase.js';
+  window.supabaseFns = { initSupabase, saveProfileAndReturnUrl, getPublicUrl, getProfile, upsertProfile, removeFile };
+</script>
+</body>
+</html>

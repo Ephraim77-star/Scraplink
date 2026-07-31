@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrapLink - Sign Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f0f7f4;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: row;
+      width: 80%;
+      max-width: 1000px;
+      height: 75vh;
+      border-radius: 16px;
+      background: white;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    /* Left form side */
+    .form-side {
+      flex: 1;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center; /* ✅ centers items horizontally */
+      gap: 20px;
+    }
+
+    .form-side h2 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #0E8F5B;
+    }
+
+    .input-field {
+      width: 100%;
+      max-width: 350px; /* ✅ prevents stretching full width */
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #bbb;
+      outline: none;
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: #0E8F5B;
+    }
+
+    .btn {
+      background: #0E8F5B;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.2s;
+      width: 100%;
+      max-width: 350px; /* ✅ button matches input width */
+    }
+
+    .btn:hover {
+      background: #0A6D46;
+    }
+
+    .switch-text {
+      text-align: center;
+      font-size: 14px;
+      color: gray;
+    }
+    .switch-text a {
+      color: #0E8F5B;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* Right gradient side */
+    .info-side {
+      flex: 1;
+      background: linear-gradient(135deg, #0E8F5B, #0A6D46);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 30px;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .info-side img {
+      width: 180px;
+      height: auto;
+    }
+
+    .info-side p {
+      max-width: 400px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Responsive design */
+    @media(max-width: 900px) {
+      .card {
+        flex-direction: column;
+        height: auto;
+      }
+      .info-side {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- Left side (signup form) -->
+    <div class="form-side">
+      <h2>Create Account</h2>
+      <input id="nameInput" type="text" class="input-field" placeholder="Full Name">
+      <input id="emailInput" type="email" class="input-field" placeholder="Email">
+      <input id="passwordInput" type="password" class="input-field" placeholder="Password">
+      <input id="confirmInput" type="password" class="input-field" placeholder="Confirm Password">
+      <button class="btn" id="signupBtn">Sign Up</button>
+  <div id="authMessage" style="color: #b00020; font-weight: 600; margin-top: 8px; display: none;"></div>
+      <div class="switch-text">
+        Already have an account? <a href="login.html">Login</a>
+      </div>
+    </div>
+
+    <!-- Right side (info gradient) -->
+    <div class="info-side">
+      <img src="images/scraplogo.png" alt="ScrapLink Logo">
+      <p>
+        We are building a cleaner and more sustainable Nigeria by connecting people to recycle and earn from their waste. 
+        Join us and make the world a better place by turning your Trash into Cash. 
+        You Scrap It, We Link It.
+      </p>
+      <button class="btn-outline" onclick="window.location.href='login.html'">Login</button>
+    </div>
+  </div>
+
+  <script>
+    // ...existing code...
+  </script>
+
+<script type="module">
+  import { initSupabase } from './supabase.js';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+  import { signUp } from './auth.js';
+
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.authFns = { signUp };
+
+  const signupBtn = document.getElementById('signupBtn');
+  signupBtn.addEventListener('click', async () => {
+    const msgEl = document.getElementById('authMessage');
+    function show(msg, isError = true) {
+      msgEl.style.display = 'block';
+      msgEl.style.color = isError ? '#b00020' : '#0E8F5B';
+      msgEl.innerText = msg;
+    }
+
+    signupBtn.disabled = true; signupBtn.innerText = 'Signing up...';
+    const name = document.getElementById('nameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const confirm = document.getElementById('confirmInput').value;
+    if (!name || !email || !password) { show('Fill all fields'); signupBtn.disabled=false; signupBtn.innerText='Sign Up'; return; }
+    if (password !== confirm) { show('Passwords do not match'); signupBtn.disabled=false; signupBtn.innerText='Sign Up'; return; }
+
+    try {
+      const res = await signUp(email, password, { full_name: name });
+      console.log('signup response', res);
+      signupBtn.disabled=false; signupBtn.innerText='Sign Up';
+
+      // supabase v2 returns { data, error } where data may contain user/session
+      const error = res?.error || res?.data?.error || null;
+      if (error) {
+        show('Signup failed: ' + (error.message || JSON.stringify(error)), true);
+        return;
+      }
+
+      // Save basic profile locally under anon key (will be migrated to user key on login)
+      // If there's no uploaded profilePic, generate a colored initial avatar as a data-URL SVG
+      // Deterministic avatar color based on seed (email) so avatar is consistent across devices
+      function deterministicColor(seed) {
+        let h = 0;
+        for (let i = 0; i < seed.length; i++) {
+          h = (h * 31 + seed.charCodeAt(i)) % 360;
+        }
+        const s = 60;
+        const l = 45;
+        return `hsl(${h} ${s}% ${l}%)`;
+      }
+      function makeInitialAvatar(name, seed) {
+        const initial = (name && name.trim()[0]) ? name.trim()[0].toUpperCase() : 'U';
+        const bg = deterministicColor(seed || name || 'anon');
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'>
+          <rect width='100%' height='100%' fill='${bg}' rx='64' />
+          <text x='50%' y='50%' text-anchor='middle' dominant-baseline='middle' fill='white' font-family='Segoe UI, Arial, sans-serif' font-size='64' font-weight='700'>${initial}</text>
+        </svg>`;
+        return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+      }
+
+      const existingPic = localStorage.getItem('profilePic');
+      const picToUse = existingPic || makeInitialAvatar(name, email);
+      const profileData = { name, email, bio: '', pic: picToUse };
+      localStorage.setItem('profileData:anon', JSON.stringify(profileData));
+
+      show('Signup succeeded. Check your email if confirmation is required.', false);
+      setTimeout(() => window.location.href = 'login.html', 1200);
+    } catch (err) {
+      console.error('signup error', err);
+      signupBtn.disabled=false; signupBtn.innerText='Sign Up';
+      show('Signup error: ' + (err.message || String(err)), true);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrapLink Login</title>
+<style>
+  /* Reset */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body, html {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #e0f7f1, #f5f5f5);
+  }
+
+  /* Card */
+  .card {
+    width: 95%;
+    max-width: 900px; /* Increased width */
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeIn 0.7s forwards;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Logo */
+  .card h1 {
+    color: #0E8F5B;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  /* Input fields with floating labels */
+  .input-group {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1.8rem;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 15px 12px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    outline: none;
+    font-size: 1rem;
+    background: transparent;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .input-group input:focus {
+    border-color: #0E8F5B;
+    box-shadow: 0 0 8px rgba(14, 143, 91, 0.2);
+  }
+
+  .input-group label {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+    background: rgba(255,255,255,0.97);
+    padding: 0 5px;
+    transition: 0.3s ease all;
+  }
+
+  .input-group input:focus + label,
+  .input-group input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 0.85rem;
+    color: #0E8F5B;
+  }
+
+  /* Button */
+  .login-btn {
+    width: 100%;
+    max-width: 250px; /* Wider button */
+    height: 50px;
+    border-radius: 12px;
+    background-color: #0E8F5B;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    margin: 1.2rem 0;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  }
+
+  .login-btn:hover {
+    background-color: #0b7043;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  /* Signup text */
+  .signup-text {
+    color: #666;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .signup-text a {
+    color: #0E8F5B;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .signup-text a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .card { max-width: 750px; padding: 2.8rem; }
+    .card h1 { font-size: 2.4rem; }
+  }
+
+  @media (max-width: 768px) {
+    .card { max-width: 600px; padding: 2.5rem; }
+    .card h1 { font-size: 2.2rem; }
+  }
+
+  @media (max-width: 480px) {
+    .card { max-width: 95%; padding: 2rem; }
+    .card h1 { font-size: 2rem; }
+    .login-btn { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>ScrapLink</h1>
+
+  <div class="input-group">
+    <input id="emailInput" type="email" placeholder=" " required>
+    <label>Email</label>
+  </div>
+
+  <div class="input-group">
+    <input id="passwordInput" type="password" placeholder=" " required>
+    <label>Password</label>
+  </div>
+
+  <button class="login-btn" id="loginBtn">Login</button>
+  <div id="authMessage" style="color: #b00020; font-weight: 600; margin-top: 8px; display: none;"></div>
+
+  <p class="signup-text">
+    Don't have an account? <a href="signup.html">Sign up</a>
+  </p>
+</div>
+
+<script>
+  function login() { alert("Redirect to HomeFeedPage"); }
+  function signup() { alert("Redirect to SignupPage"); }
+</script>
+
+<script type="module">
+  import { initSupabase } from './supabase.js';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+  import { signIn, signUp, getUser } from './auth.js';
+
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.authFns = { signIn, signUp, getUser };
+
+  const loginBtn = document.getElementById('loginBtn');
+  loginBtn.addEventListener('click', async () => {
+    const msgEl = document.getElementById('authMessage');
+    function show(msg, isError = true) {
+      msgEl.style.display = 'block';
+      msgEl.style.color = isError ? '#b00020' : '#0E8F5B';
+      msgEl.innerText = msg;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.innerText = 'Signing in...';
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    if (!email || !password) { show('Enter email and password'); loginBtn.disabled=false; loginBtn.innerText='Login'; return; }
+
+    try {
+      const res = await signIn(email, password);
+      console.log('signin response', res);
+      loginBtn.disabled = false;
+      loginBtn.innerText = 'Login';
+
+      const error = res?.error || res?.data?.error || null;
+      if (error) {
+        show('Login failed: ' + (error.message || JSON.stringify(error)), true);
+        return;
+      }
+
+      // On success, fetch user and persist basic profileData locally if missing
+      try {
+        const ures = await getUser();
+        const user = ures?.data?.user;
+        if (user) {
+          const key = `profileData:${user.id}`;
+            const existing = JSON.parse(localStorage.getItem(key) || 'null') || {};
+            // deterministic avatar generator so fallback avatars remain consistent across devices
+            function deterministicColor(seed) {
+              let h = 0;
+              for (let i = 0; i < seed.length; i++) {
+                h = (h * 31 + seed.charCodeAt(i)) % 360;
+              }
+              const s = 60;
+              const l = 45;
+              return `hsl(${h} ${s}% ${l}%)`;
+            }
+            function makeInitialAvatar(name, seed) {
+              const initial = (name && name.trim()[0]) ? name.trim()[0].toUpperCase() : 'U';
+              const bg = deterministicColor(seed || name || 'anon');
+              const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'>\n              <rect width='100%' height='100%' fill='${bg}' rx='64' />\n              <text x='50%' y='50%' text-anchor='middle' dominant-baseline='middle' fill='white' font-family='Segoe UI, Arial, sans-serif' font-size='64' font-weight='700'>${initial}</text>\n            </svg>`;
+              return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+            }
+
+            const existingAnon = JSON.parse(localStorage.getItem('profileData:anon')||'null') || {};
+            const anonPic = existingAnon.pic || makeInitialAvatar(user.user_metadata?.full_name || user.email || 'User', user.email || 'anon');
+            const pd = { name: existing.name || user.user_metadata?.full_name || '', email: existing.email || user.email || '', bio: existing.bio || '', pic: existing.picture || existing.pic || anonPic };
+            // migrate stored profileStoragePath from anon into user-scoped profile if present
+            if (!pd.profileStoragePath && existingAnon.profileStoragePath) {
+              pd.profileStoragePath = existingAnon.profileStoragePath;
+            }
+            localStorage.setItem(key, JSON.stringify(pd));
+        }
+      } catch(e) { console.warn('Could not fetch user after sign-in', e); }
+
+      show('Login successful', false);
+      setTimeout(() => window.location.href = 'home.html', 600);
+    } catch (err) {
+      console.error('signin error', err);
+      loginBtn.disabled = false;
+      loginBtn.innerText = 'Login';
+      show('Login error: ' + (err.message || String(err)), true);
+    }
+  });
+</script>
+
+</body>
+</html>

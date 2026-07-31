@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrapLink</title>
+  <style>
+    :root {
+      --brand: #0E8F5B;
+      --brand-dark: #0A6D46;
+      --ink: #0F172A;
+      --subInk: #475569;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #f9fafb;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    /* NAVBAR */
+    header {
+      position: sticky;
+      top: 0;
+      background: white;
+      border-bottom: 1px solid #E2E8F0;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+      z-index: 1000;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .logo span:first-child {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--brand-dark);
+    }
+    .logo span:last-child {
+      font-size: 0.8rem;
+      color: grey;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* login link that sits at the far right (beside the scrollbar) */
+    .login-link {
+      display: inline-block; /* visible on all sizes */
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      transition: 0.3s;
+      white-space: nowrap;
+      margin-left: auto; /* push it to the far right inside .header-right */
+    }
+    .login-link:hover {
+      background: #E8F5E9;
+      color: var(--brand-dark);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+    nav a:hover {
+      background: #E8F5E9;
+      color: var(--brand-dark);
+    }
+
+    .cta {
+      background: var(--brand);
+      color: white !important;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .cta:hover {
+      background: var(--brand-dark);
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      max-width: 700px;
+      margin: 0 auto;
+      color: var(--subInk);
+      font-size: 1rem;
+    }
+    .hero-buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .btn {
+      padding: 0.9rem 1.4rem;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: 0.3s;
+    }
+    .btn.primary {
+      background: var(--brand);
+      color: white;
+    }
+    .btn.primary:hover {
+      background: var(--brand-dark);
+    }
+    .btn.secondary {
+      background: white;
+      color: black;
+      border: 1px solid #CBD5E1;
+    }
+    .btn.secondary:hover {
+      background: #F1F5F9;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+    .features h2 {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      color: var(--ink);
+    }
+    .cards {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      text-align: left;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card .icon {
+      font-size: 1.5rem;
+    }
+    .card h3 {
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
+      color: var(--ink);
+    }
+    .card p {
+      color: var(--subInk);
+      font-size: 0.95rem;
+    }
+
+    /* ABOUT */
+    .about {
+      background: #F1F8F6;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+    .about h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--ink);
+    }
+    .about p {
+      max-width: 700px;
+      margin: auto;
+      font-size: 1rem;
+      color: var(--subInk);
+    }
+
+    /* CONTACT */
+    .contact {
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+    .contact h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--ink);
+    }
+    .contact p {
+      color: var(--subInk);
+      margin-bottom: 1rem;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: var(--brand);
+      color: white;
+    }
+
+    /* RESPONSIVE NAV */
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        position: absolute;
+        top: 64px;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        border-left: 1px solid #E2E8F0;
+        border-bottom: 1px solid #E2E8F0;
+      }
+      nav.show {
+        display: flex;
+      }
+      /* ensure mobile still shows login at the right */
+      .login-link {
+        display: inline-block;
+        order: 3;
+        z-index: 1100;
+      }
+      header {
+        /* ensure header children stay aligned when extra element appears */
+        gap: 0.5rem;
+      }
+      .hamburger {
+        display: block;
+      }
+    }
+
+    /* keep the header-right grouped and push it to the far right */
+    .header-right {
+      margin-left: auto;
+    }
+
+    /* make the hamburger sit at the extreme right edge (pushes itself to the far right) */
+    .header-right .hamburger {
+      margin-left: auto;
+      padding-left: 8px;
+    }
+
+    /* ensure on desktop the hamburger stays hidden but when visible it's at the edge */
+    @media (min-width: 769px) {
+      .header-right .hamburger {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header>
+    <div class="logo">
+      <span>ScrapLink</span>
+      <span>eco-market</span>
+    </div>
+    <div class="header-right">
+      <nav id="nav">
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="education.html">Education</a>
+        <a href="#" class="cta" onclick="window.location.href='signup.html'">Get Started</a>
+      </nav>
+      <a href="login.html" class="login-link">Login</a>
+      <button class="hamburger" onclick="toggleMenu()">☰</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Turn Waste into Value ♻️</h1>
+    <p>A location-based marketplace for selling and recycling scrap across Nigeria. Don’t trash it — Cash it!</p>
+    <div class="hero-buttons">
+      <button class="btn primary">Start Posting Scrap</button>
+      <button class="btn secondary">Browse Nearby Scrap</button>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <h2>Why ScrapLink?</h2>
+    <div class="cards">
+      <div class="card"><span class="icon">📍</span><h3>Location-Based</h3><p>See scrap posts near you first, with optional radius filters.</p></div>
+      <div class="card"><span class="icon">♻️</span><h3>Sell or Recycle</h3><p>Post plastics, metals, e-waste, books, and more — connect with buyers or recyclers.</p></div>
+      <div class="card"><span class="icon">⚡</span><h3>Fast & Simple</h3><p>Quick signup, instant posts, clean UI.</p></div>
+      <div class="card"><span class="icon">🕒</span><h3>Newest First</h3><p>Feed sorts posts from most recent down.</p></div>
+      <div class="card"><span class="icon">🗂️</span><h3>By Types</h3><p>Filter by category: plastics, metals, electronics, paper, furniture…</p></div>
+      <div class="card"><span class="icon">📸</span><h3>Photo Uploads</h3><p>Clear photos help close deals faster.</p></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <h2>About Us</h2>
+    <p>We are building a cleaner and more sustainable Nigeria by connecting people to recycle and earn from their waste.</p>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <h2>Contact</h2>
+    <p>📧 contact@scraplink.ng<br>📱 +234 800 000 0000</p>
+
+    <!-- ===== CONTACTS ===== -->
+<section id="contacts" style="padding:40px 20px; background:#f5f5f5; text-align:center;">
+  <h2 style="font-size:24px; font-weight:bold; color:#0E8F5B; margin-bottom:20px;">Contact Us</h2>
+  <p style="margin-bottom:30px; color:#555; max-width:600px; margin-left:auto; margin-right:auto;">
+    Have questions or feedback? Send us a message!
+  </p>
+
+  <form style="max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:15px;">
+    <input type="text" name="name" placeholder="Your Name" required
+           style="padding:12px 15px; border-radius:12px; border:1px solid #ddd; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+    
+    <input type="email" name="email" placeholder="Your Email" required
+           style="padding:12px 15px; border-radius:12px; border:1px solid #ddd; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+    
+    <input type="text" name="subject" placeholder="Subject" required
+           style="padding:12px 15px; border-radius:12px; border:1px solid #ddd; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+
+    <textarea name="message" placeholder="Your Message" required rows="5"
+              style="padding:12px 15px; border-radius:12px; border:1px solid #ddd; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.05);"></textarea>
+
+    <button type="submit"
+            style="padding:14px; border:none; border-radius:12px; background:#0E8F5B; color:white; font-weight:bold; cursor:pointer; transition:all 0.3s; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+      Send Message
+    </button>
+  </form>
+</section>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 ScrapLink. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("nav").classList.toggle("show");
+    }
+  </script>
+</body>
+</html>

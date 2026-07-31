@@ -1,0 +1,133 @@
+<!-- drawer.html -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="avatar">S</div>
+    <div class="info">
+      <div class="name">ScrapLink</div>
+      <div class="tagline">eco-market</div>
+    </div>
+  </div>
+  <hr>
+  <div class="menu-item" onclick="navigateTo('index.html')">
+    <img src="images/home.png" alt=""><span>Home Page</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('view.html')">
+    <img src="images/view.png" alt=""><span>View Scraps</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('view.html')">
+    <img src="images/buy.png" alt=""><span>Buy Scraps</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('post.html')">
+    <img src="images/sell.png" alt=""><span>Post Scraps</span>
+  </div>
+  <div class="menu-item" onclick="navigateTo('supportUs.html')">
+    <img src="images/support.png" alt=""><span>Support Us</span>
+  </div>
+  <hr>
+  <div class="cta" onclick="navigateTo('join.html')">Join Us</div>
+</div>
+
+<style>
+  .drawer {
+    width: 260px;
+    height: 100vh;
+    background: #1e293b; /* dark slate */
+    color: #f8fafc;
+    position: fixed;
+    top: 0;
+    left: -260px; /* hidden initially */
+    transition: left 0.3s ease;
+    padding: 20px 15px;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.4);
+    z-index: 999;
+  }
+
+  .drawer.open {
+    left: 0;
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .drawer-header .avatar {
+    width: 50px;
+    height: 50px;
+    background: #38bdf8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  .drawer-header .info .name {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .drawer-header .info .tagline {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    background: #334155;
+    margin: 10px 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 4px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .menu-item img {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    filter: brightness(0) invert(1);
+  }
+
+  .menu-item:hover {
+    background: #334155;
+  }
+
+  .menu-item span {
+    font-size: 15px;
+  }
+
+  .cta {
+    margin-top: 20px;
+    padding: 12px;
+    background: #38bdf8;
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .cta:hover {
+    background: #0ea5e9;
+  }
+</style>
+
+<script>
+  function navigateTo(page) {
+    window.location.href = page;
+  }
+</script>
